@@ -2,7 +2,7 @@
 A lightweight command-line utility for SHA-256 file integrity verification.
 
 ## Description
-```itfl`` provides a fast and simple way to verify that a file has not been corrupted during download or otherwise tampered with, by computing the SHA256 hash for the downloaded file, and comparing it with the hash for the original file.
+```itfl``` provides a fast and simple way to verify that a file has not been corrupted during download or otherwise tampered with, by computing the SHA256 hash for the downloaded file, and comparing it with the hash for the original file.
 
 Written in C++.
 
