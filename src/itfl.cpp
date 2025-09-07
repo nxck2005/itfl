@@ -1,3 +1,33 @@
+// ITFL: tool to verify sha256 hash for files
+// Simple tool to check file integrity manually.
+// Author: Nishchal Ravi
+
+// version 0.1.0
+
+/*
+    MIT License
+
+    Copyright (c) 2025 Nishchal Ravi
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+*/
 #include "../lib/picosha2.h"
 #include <fstream>
 #include <iostream>
@@ -5,12 +35,18 @@
 #include <vector>
 
 int main(int argc, char* argv[]) {
-    if (argc != 2) {
-        std::cerr << "Usage: " << argv[0] << " <filename>\n";
+    // The second argument must be the filename, and third is the hash to check against. Parse it, and throw an error otherwise
+    if (argc != 3) {
+        std::cerr << "Usage: " << argv[0] << " <filename> <hash to check against>\n";
         return 1;
     }
-
     const std::string filename = argv[1];
+    const std::string givenHash = argv[2];
+    
+    if (givenHash.length() != 64) {
+        std::cerr << "Error: Invalid length for given hash string\n";
+        return 1;
+    }
 
     // Read the file's contents into a vector
     std::ifstream file_stream(filename, std::ios::binary);
@@ -19,11 +55,19 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    // Create a vector that'll store the hashed value in bytes (??)
     std::vector<unsigned char> s(picosha2::k_digest_size);
     picosha2::hash256(file_stream, s.begin(), s.end());
+
+    // Bytes to the actual string
     std::string result = picosha2::bytes_to_hex_string(s.begin(), s.end());
 
-    std::cout << "SHA-256 hash of " << filename << ": " << result << std::endl;
-
+    std::cout << "Calculated SHA-256 hash of " << filename << ": " << result << std::endl;
+    std::cout << "Given hash: " << givenHash << std::endl;
+    if (result == givenHash) {
+        std::cout << "FILE IS LEGIT!" << std::endl;
+    } else {
+        std::cout << "HASH CHECK FAILED!" << std::endl;
+    }
     return 0;
 }
