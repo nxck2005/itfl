@@ -19,14 +19,11 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    std::vector<char> file_data((std::istreambuf_iterator<char>(file_stream)),
-                                 std::istreambuf_iterator<char>());
+    std::vector<unsigned char> s(picosha2::k_digest_size);
+    picosha2::hash256(file_stream, s.begin(), s.end());
+    std::string result = picosha2::bytes_to_hex_string(s.begin(), s.end());
 
-    // Now, pass the data container to the picosha2 hash function
-    std::string hash_hex_str;
-    picosha2::hash256(file_data, hash_hex_str);
-
-    std::cout << "SHA-256 hash of " << filename << ": " << hash_hex_str << std::endl;
+    std::cout << "SHA-256 hash of " << filename << ": " << result << std::endl;
 
     return 0;
 }
