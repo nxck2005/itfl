@@ -36,14 +36,19 @@
 
 int main(int argc, char* argv[]) {
     // The second argument must be the filename, and third is the hash to check against. Parse it, and throw an error otherwise
-    if (argc != 3) {
-        std::cerr << "Usage: " << argv[0] << " <filename> <hash to check against>\n";
+    if (argc > 4) {
+        std::cerr << "Usage: " << argv[0] << " <filename> <hash to check against> <-v>\n";
         return 1;
     }
 
-    bool verbose = true;
+    bool verbose = false;
+    
     const std::string filename = argv[1];
     const std::string givenHash = argv[2];
+
+    if (argc > 3) {
+        if (std::string(argv[3]) == "-v") verbose = true;
+    }
     
     if (givenHash.length() != 64) {
         std::cerr << "Error: Invalid length for given hash string\n";
@@ -68,6 +73,7 @@ int main(int argc, char* argv[]) {
         std::cout << "Calculated SHA-256 hash of " << filename << ": " << result << std::endl;
         std::cout << "Given hash: " << givenHash << std::endl;
     }
+
     if (result == givenHash) {
         std::cout << "Hash check passed; Given file matches hash provided" << std::endl;
     } else {
