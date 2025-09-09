@@ -69,9 +69,9 @@ int main(int argc, char* argv[]) {
         std::cout << "Given hash: " << givenHash << std::endl;
     }
     if (result == givenHash) {
-        std::cout << "FILE IS LEGIT!" << std::endl;
+        std::cout << "Hash check passed; Given file matches hash provided" << std::endl;
     } else {
-        std::cout << "HASH CHECK FAILED!" << std::endl;
+        std::cout << "Hash check failed! File does not match hash provided" << std::endl;
     }
     return 0;
 }
