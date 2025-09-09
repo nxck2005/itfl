@@ -29,6 +29,7 @@
 
 */
 #include "../lib/picosha2.h"
+#include "../lib/cxxopts.hpp"
 #include <fstream>
 #include <iostream>
 #include <string>
