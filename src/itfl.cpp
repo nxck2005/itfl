@@ -40,6 +40,8 @@ int main(int argc, char* argv[]) {
         std::cerr << "Usage: " << argv[0] << " <filename> <hash to check against>\n";
         return 1;
     }
+
+    bool verbose = true;
     const std::string filename = argv[1];
     const std::string givenHash = argv[2];
     
@@ -62,8 +64,10 @@ int main(int argc, char* argv[]) {
     // Bytes to the actual string
     std::string result = picosha2::bytes_to_hex_string(s.begin(), s.end());
 
-    std::cout << "Calculated SHA-256 hash of " << filename << ": " << result << std::endl;
-    std::cout << "Given hash: " << givenHash << std::endl;
+    if (verbose) {
+        std::cout << "Calculated SHA-256 hash of " << filename << ": " << result << std::endl;
+        std::cout << "Given hash: " << givenHash << std::endl;
+    }
     if (result == givenHash) {
         std::cout << "FILE IS LEGIT!" << std::endl;
     } else {
