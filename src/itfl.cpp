@@ -35,12 +35,54 @@
 #include <string>
 #include <vector>
 
+// Windows specific imports, for color right now
+#ifdef _WIN32
+#include <windows.h>
+#include <io.h>
+#define IS_TTY _isatty
+#define FILENO _fileno
+#else
+#include <unistd.h>
+#define IS_TTY isatty
+#define FILENO fileno
+#endif
+
+// To manage terminal colors
+class TerminalColor {
+    public:
+    const std::string red;
+    const std::string green;
+    const std::string blue;
+    const std::string reset;
+
+    // Set the ansi codes if the term isnt a TTY. Logic is in the private func
+    TerminalColor() :
+        red(colorSupport() ? "\033[31m" : ""),
+        green(colorSupport() ? "\033[32m" : ""),
+        blue(colorSupport() ? "\033[34m" : ""),
+        reset(colorSupport() ? "\033[0m" : "")
+    {}
+    
+    private:
+    bool colorSupport() const {
+        #ifdef _WIN32
+        // For now, just use normal text if user is on Windows.
+        // Yet to learn how windows handles it 
+        return false;
+        #else
+        return IS_TTY(FILENO(stdout));
+        #endif
+    }
+};
+
 int main(int argc, char* argv[]) {
     // The second argument must be the filename, and third is the hash to check against. Parse it, and throw an error otherwise
-    if (argc > 4) {
+    if (argc > 4 || argc < 3) {
         std::cerr << "Usage: " << argv[0] << " <filename> <hash to check against> <-v>\n";
         return 1;
     }
+
+    const TerminalColor color;
 
     bool verbose = false;
     
@@ -52,14 +94,14 @@ int main(int argc, char* argv[]) {
     }
     
     if (givenHash.length() != 64) {
-        std::cerr << "Error: Invalid length for given hash string\n";
+        std::cerr << color.red << "Error: " << color.reset << "Invalid length for given hash string\n";
         return 1;
     }
 
     // Read the file's contents into a vector
     std::ifstream file_stream(filename, std::ios::binary);
     if (!file_stream) {
-        std::cerr << "Error: Could not open file " << filename << ".\n";
+        std::cerr << color.red << "Error: " << color.reset << "Could not open file: '" << filename << "'.\n";
         return 1;
     }
 
@@ -76,9 +118,9 @@ int main(int argc, char* argv[]) {
     }
 
     if (result == givenHash) {
-        std::cout << "Hash check passed; Given file matches hash provided" << std::endl;
+        std::cout << color.green << "Hash check passed!" << color.reset << " Given file matches hash provided" << std::endl;
     } else {
-        std::cout << "Hash check failed! File does not match hash provided" << std::endl;
+        std::cout << color.red << "Hash check failed!" << color.reset << " File does not match hash provided" << std::endl;
     }
     return 0;
 }
