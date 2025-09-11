@@ -34,6 +34,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <array>
 
 // Windows specific imports, for color right now
 #ifdef _WIN32
@@ -67,13 +68,48 @@ class TerminalColor {
     bool colorSupport() const {
         #ifdef _WIN32
         // For now, just use normal text if user is on Windows.
-        // Yet to learn how windows handles it 
         return false;
         #else
         return IS_TTY(FILENO(stdout));
         #endif
     }
 };
+
+// Given a file stream, return it's SHA256 hash using a buffer based approach
+std::string getHash(std::ifstream& file_stream) {
+    
+    // Get a hasher object
+    picosha2::hash256_one_by_one hasher;
+
+    // Buffer of size 256KB
+    std::array<char, 262144> buf;
+
+    // Read full buffers until eofbit and failbit are set by file_stream.read()
+    // eofbit set when end of file is hit
+    // This also triggers failbit because full read request was not completed
+    // This will make the while loop evaluate to false
+    // Process the read buffers
+    while (file_stream.read(buf.data(), buf.size())) {
+        hasher.process(buf.begin(), buf.end());
+    }
+
+    // See if there were more than 0 bytes read at the end, when there's not a full buffer left
+    // If so, process those bytes too
+    std::streamsize bytesRead = file_stream.gcount();
+    if (bytesRead > 0) {
+        hasher.process(buf.begin(), buf.begin() + bytesRead);
+    }
+    
+    // Finish reading and "digesting" lol
+    hasher.finish();
+
+    // As per the repo documentation
+    std::vector<unsigned char> hash(picosha2::k_digest_size);
+    hasher.get_hash_bytes(hash.begin(), hash.end());
+    std::string computedHash = picosha2::get_hash_hex_string(hasher);
+
+    return computedHash;
+}
 
 int main(int argc, char* argv[]) {
 
@@ -124,7 +160,7 @@ int main(int argc, char* argv[]) {
             return 1;
         }
 
-        // Read the file's contents into a vector
+        // Read the file's contents in binary mode
         std::ifstream file_stream(filename, std::ios::binary);
         if (!file_stream) {
             std::cerr << color.red << "Error: " << color.reset << "Could not open file: '" << filename << "'.\n";
@@ -135,11 +171,13 @@ int main(int argc, char* argv[]) {
         // TODO: switch to a buffer based approach
 
         // Create a vector that'll store the hashed value in bytes (??)
-        std::vector<unsigned char> s(picosha2::k_digest_size);
-        picosha2::hash256(file_stream, s.begin(), s.end());
+        // std::vector<unsigned char> s(picosha2::k_digest_size);
+        // picosha2::hash256(file_stream, s.begin(), s.end());
 
-        // Bytes to the actual string
-        std::string computedHash = picosha2::bytes_to_hex_string(s.begin(), s.end());
+        // // Bytes to the actual string
+        // std::string computedHash = picosha2::bytes_to_hex_string(s.begin(), s.end());
+
+        std::string computedHash = getHash(file_stream);
 
         if (verbose) {
             std::cout << "Calculated SHA-256 hash of " << filename << ": " << computedHash << std::endl;
