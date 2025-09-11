@@ -56,6 +56,11 @@ Contributions are welcome. Please fork the repo and use a feature branch if you 
 
 If you have a suggestion or a bug report, please open an issue [here.](https://github.com/nxck2005/itfl/issues "Issues")
 
+## Short-term TODO
+- Add a diff showing the differences in hashes if the hash check fails
+- Calculate multiple hashes
+- Scrape a hash from an endpoint? Hmm..
+
 ## Acknowledgements
 
 This repo utilizes the single-header library by [Stephan Brumme](https://create.stephan-brumme.com/hash-library/), for the SHA-256 implementation, and [cxxopts](https://github.com/jarro2783/cxxopts) by [Jarryd Beck](https://github.com/jarro2783).
