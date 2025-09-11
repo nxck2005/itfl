@@ -76,51 +76,82 @@ class TerminalColor {
 };
 
 int main(int argc, char* argv[]) {
-    // The second argument must be the filename, and third is the hash to check against. Parse it, and throw an error otherwise
-    if (argc > 4 || argc < 3) {
-        std::cerr << "Usage: " << argv[0] << " <filename> <hash to check against> <-v>\n";
+
+    try {
+        cxxopts::Options options("itfl", "A lightweight command-line utility for SHA-256 file integrity verification \n\nUsage:\n itfl [OPTIONS] <filename> <hash>");
+        options.add_options()
+            ("v,verbose", "Enable verbose output")
+            ("f,filename", "File to process", cxxopts::value<std::string>())
+            ("h,hash", "SHA-256 hash to check against", cxxopts::value<std::string>())
+            ("version", "Print version information")
+            ("help", "Print usage");
+
+        // Filename and hash can be given anywhere without a flag, so parse them in this order
+        options.parse_positional({"filename", "hash"});
+
+        // Return an object that contains proxy objects for the arguments
+        auto result = options.parse(argc, argv);
+
+        const TerminalColor color;
+
+        // .count() returns number of times the option was specified
+        // 1 would evaluate this to true
+        if (result.count("help")) {
+            std::cout << options.help() << std::endl;
+            return 0;
+        }
+
+        if (result.count("version")) {
+            // TODO: grab from cmake
+            std::cout << "itfl version " << "0.2.0" << std::endl;
+            return 0;
+        }
+
+        if (result.count("filename") == 0 || result.count("hash") == 0) {
+            std::cerr << color.red << "Error: " << color.reset << "Missing required arguments. \n\n" << options.help() << std::endl;
+            return 1;
+        }
+
+        // 1 evaluates to true
+        bool verbose = result.count("verbose");
+
+        // Cast the proxy object value to an actual string
+        const std::string filename = result["filename"].as<std::string>();
+        const std::string givenHash = result["hash"].as<std::string>();
+        
+        if (givenHash.length() != 64) {
+            std::cerr << color.red << "Error: " << color.reset << "Invalid length for given hash string\n";
+            return 1;
+        }
+
+        // Read the file's contents into a vector
+        std::ifstream file_stream(filename, std::ios::binary);
+        if (!file_stream) {
+            std::cerr << color.red << "Error: " << color.reset << "Could not open file: '" << filename << "'.\n";
+            return 1;
+        }
+
+        // Create a vector that'll store the hashed value in bytes (??)
+        std::vector<unsigned char> s(picosha2::k_digest_size);
+        picosha2::hash256(file_stream, s.begin(), s.end());
+
+        // Bytes to the actual string
+        std::string computedHash = picosha2::bytes_to_hex_string(s.begin(), s.end());
+
+        if (verbose) {
+            std::cout << "Calculated SHA-256 hash of " << filename << ": " << computedHash << std::endl;
+            std::cout << "Given hash: " << givenHash << std::endl;
+        }
+
+        if (computedHash == givenHash) {
+            std::cout << color.green << "Hash check passed!" << color.reset << " Given file matches hash provided" << std::endl;
+        } else {
+            std::cout << color.red << "Hash check failed!" << color.reset << " File does not match hash provided" << std::endl;
+        }
+    } catch (const cxxopts::exceptions::exception& e) {
+        // If anything occurs, deviate from the happy little path
+        std::cerr << "Error: " << e.what() << std::endl;
         return 1;
-    }
-
-    const TerminalColor color;
-
-    bool verbose = false;
-    
-    const std::string filename = argv[1];
-    const std::string givenHash = argv[2];
-
-    if (argc > 3) {
-        if (std::string(argv[3]) == "-v") verbose = true;
-    }
-    
-    if (givenHash.length() != 64) {
-        std::cerr << color.red << "Error: " << color.reset << "Invalid length for given hash string\n";
-        return 1;
-    }
-
-    // Read the file's contents into a vector
-    std::ifstream file_stream(filename, std::ios::binary);
-    if (!file_stream) {
-        std::cerr << color.red << "Error: " << color.reset << "Could not open file: '" << filename << "'.\n";
-        return 1;
-    }
-
-    // Create a vector that'll store the hashed value in bytes (??)
-    std::vector<unsigned char> s(picosha2::k_digest_size);
-    picosha2::hash256(file_stream, s.begin(), s.end());
-
-    // Bytes to the actual string
-    std::string result = picosha2::bytes_to_hex_string(s.begin(), s.end());
-
-    if (verbose) {
-        std::cout << "Calculated SHA-256 hash of " << filename << ": " << result << std::endl;
-        std::cout << "Given hash: " << givenHash << std::endl;
-    }
-
-    if (result == givenHash) {
-        std::cout << color.green << "Hash check passed!" << color.reset << " Given file matches hash provided" << std::endl;
-    } else {
-        std::cout << color.red << "Hash check failed!" << color.reset << " File does not match hash provided" << std::endl;
     }
     return 0;
 }
