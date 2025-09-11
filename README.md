@@ -15,7 +15,7 @@ Written in C++.
 ### From Source
 ### Prerequisites:
 - A C++17 compliant compiler (gcc, clang, MSVC etc.)
-- CMake
+- CMake (min. version: v3.24)
 - Git
 
 ```bash
