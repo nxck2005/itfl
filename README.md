@@ -14,7 +14,7 @@ Written in C++.
 ## Installation
 ### From Source
 ### Prerequisites:
-- A C++11 compliant compiler (gcc, clang, MSVC etc.)
+- A C++17 compliant compiler (gcc, clang, MSVC etc.)
 - Git
 
 ```bash
@@ -23,7 +23,7 @@ git clone https://github.com/your-username/itfl.git
 cd itfl
 
 # Compile
-g++ -std=c++11 -O3 -o itfl src/itfl.cpp
+g++ -std=c++17 -O3 -o itfl src/itfl.cpp
 
 # Optional: Move into PATH for easy usage
 # For Linux/macOS:
