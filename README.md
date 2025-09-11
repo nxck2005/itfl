@@ -7,7 +7,7 @@ A lightweight command-line utility for SHA-256 file integrity verification.
 Written in C++.
 
 ## Features
-- __Fast Hashing__: Efficiently processes files of any size, thanks to the amazing single-header library [picosha2](https://github.com/okdshin/PicoSHA2 "picosha2.h") by [okdshin](https://github.com/okdshin)!
+- __Fast Hashing__: Efficiently processes files of any size, thanks to the amazing single-header library by [Stephan Brumme](https://create.stephan-brumme.com/hash-library/)!
 - __Simple:__: Clean, single-purpose CLI tool that does one thing, and does it well.
 - __No Dependencies__: No external libs required to compile and run.
 
@@ -15,15 +15,18 @@ Written in C++.
 ### From Source
 ### Prerequisites:
 - A C++17 compliant compiler (gcc, clang, MSVC etc.)
+- CMake
 - Git
 
 ```bash
 # Clone the repository
 git clone https://github.com/your-username/itfl.git
 cd itfl
+mkdir build && cd build
 
 # Compile
-g++ -std=c++17 -O3 -o itfl src/itfl.cpp
+cmake ../
+make
 
 # Optional: Move into PATH for easy usage
 # For Linux/macOS:
@@ -37,13 +40,15 @@ I'll put out binaries for Linux for every major release :) x86_64 only.
 ## Usage
 
 ```bash
-itfl <filename> <expected-sha256-hash> <-v>
+itfl <filename> <expected-sha256-hash> <--verbose>
 ```
 
 ### Arguments:
 - ```filename``` : relative or absolute path to the file you want to verify
 - ```expected-sha256-hash``` : SHA-256 hex string to check against
-- ```-v``` : verbose flag; print out both computed and provided hash
+- ```--verbose``` : verbose flag; print out both computed and provided hash
+
+More can be viewed by --help.
 
 ## Contributing
 
@@ -53,7 +58,7 @@ If you have a suggestion or a bug report, please open an issue [here.](https://g
 
 ## Acknowledgements
 
-This repo utilizes the single-header library [picosha2](https://github.com/okdshin/PicoSHA2 "picosha2.h") by [okdshin](https://github.com/okdshin), for the SHA-256 implementation.
+This repo utilizes the single-header library by [Stephan Brumme](https://create.stephan-brumme.com/hash-library/), for the SHA-256 implementation, and [cxxopts](https://github.com/jarro2783/cxxopts) by [Jarryd Beck](https://github.com/jarro2783).
 
 ## License
 
