@@ -8,7 +8,7 @@ Written in C++.
 
 ## Features
 - __Fast Hashing__: Efficiently processes files of any size, thanks to the amazing single-header library by [Stephan Brumme](https://create.stephan-brumme.com/hash-library/)!
-- __Simple:__: Clean, single-purpose CLI tool that does one thing, and does it well.
+- __Simple__: Clean, single-purpose CLI tool that does one thing, and does it well.
 - __No Dependencies__: No external libs required to compile and run.
 
 ## Installation
