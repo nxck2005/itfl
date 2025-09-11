@@ -131,6 +131,9 @@ int main(int argc, char* argv[]) {
             return 1;
         }
 
+        // This vector based approach is inefficient. Just hashing a 1.5Gig file scaled to 1MB :/
+        // TODO: switch to a buffer based approach
+
         // Create a vector that'll store the hashed value in bytes (??)
         std::vector<unsigned char> s(picosha2::k_digest_size);
         picosha2::hash256(file_stream, s.begin(), s.end());
