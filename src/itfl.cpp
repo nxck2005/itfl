@@ -30,6 +30,7 @@
 */
 #include "../lib/picosha2.h"
 #include "../lib/cxxopts.hpp"
+#include "../lib/sha256.h"
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -79,7 +80,8 @@ class TerminalColor {
 std::string getHash(std::ifstream& file_stream) {
     
     // Get a hasher object
-    picosha2::hash256_one_by_one hasher;
+    //picosha2::hash256_one_by_one hasher;
+    SHA256 sha256;
 
     // Buffer of size 256KB
     std::array<char, 262144> buf;
@@ -89,24 +91,29 @@ std::string getHash(std::ifstream& file_stream) {
     // This also triggers failbit because full read request was not completed
     // This will make the while loop evaluate to false
     // Process the read buffers
+    std::streamsize bytesRead;
     while (file_stream.read(buf.data(), buf.size())) {
-        hasher.process(buf.begin(), buf.end());
+        bytesRead = file_stream.gcount();
+        //hasher.process(buf.begin(), buf.end());
+        sha256.add(buf.begin() ,bytesRead);
     }
 
     // See if there were more than 0 bytes read at the end, when there's not a full buffer left
     // If so, process those bytes too
-    std::streamsize bytesRead = file_stream.gcount();
+    bytesRead = file_stream.gcount();
     if (bytesRead > 0) {
-        hasher.process(buf.begin(), buf.begin() + bytesRead);
+        //hasher.process(buf.begin(), buf.begin() + bytesRead);
+        sha256.add(buf.begin(), bytesRead);
     }
     
     // Finish reading and "digesting" lol
-    hasher.finish();
+    //hasher.finish();
 
     // As per the repo documentation
-    std::vector<unsigned char> hash(picosha2::k_digest_size);
-    hasher.get_hash_bytes(hash.begin(), hash.end());
-    std::string computedHash = picosha2::get_hash_hex_string(hasher);
+    //std::vector<unsigned char> hash(picosha2::k_digest_size);
+    //hasher.get_hash_bytes(hash.begin(), hash.end());
+    //std::string computedHash = picosha2::get_hash_hex_string(hasher);
+    std::string computedHash = sha256.getHash();
 
     return computedHash;
 }
