@@ -8,7 +8,7 @@ Written in C++.
 
 ## Features
 - __Fast Hashing__: Efficiently processes files of any size, thanks to the amazing single-header library [picosha2](https://github.com/okdshin/PicoSHA2 "picosha2.h") by [okdshin](https://github.com/okdshin)!
-- __Simple By Design:__: Clean, single-purpose CLI tool that does one thing, and does it well.
+- __Simple:__: Clean, single-purpose CLI tool that does one thing, and does it well.
 - __No Dependencies__: No external libs required to compile and run.
 
 ## Installation
@@ -37,29 +37,14 @@ I'll put out binaries for Linux for every major release :) x86_64 only.
 ## Usage
 
 ```bash
-itfl <filename> <expected-sha256-hash>
+itfl <filename> <expected-sha256-hash> <-v>
 ```
 
 ### Arguments:
 - ```filename``` : relative or absolute path to the file you want to verify
 - ```expected-sha256-hash``` : SHA-256 hex string to check against
+- ```-v``` : verbose flag; print out both computed and provided hash
 
-### Successful Check:
-```bash
-$ itfl ./installer.zip e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
-
-Calculated SHA-256 hash of ./installer.zip: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
-Given hash: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
-FILE IS LEGIT!
-```
-### Failed Check:
-```bash
-$ itfl ./installer.zip e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
-
-Calculated SHA-256 hash of ./installer.zip: f2ca1bb6c7e907d06dafe4687e579fce76b37e4e93b7605022da52e6ccc26fd2
-Given hash: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
-HASH CHECK FAILED!
-```
 ## Contributing
 
 Contributions are welcome. Please fork the repo and use a feature branch if you wish to do so! Pull requests are welcome, too.
