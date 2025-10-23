@@ -138,8 +138,22 @@ int main(int argc, char* argv[]) {
         }
 
         if (result.count("filename") == 0 || result.count("hash") == 0) {
-            std::cerr << color.red << "Error: " << color.reset << "Missing required arguments. \n\n" << options.help() << std::endl;
-            return 1;
+	    // Print filename hash if no hash is given
+	    if (result.count("hash") == 0) {
+		const std::string filename = result["filename"].as<std::string>();
+		std::ifstream file_stream(filename, std::ios::binary);
+		if (!file_stream) {
+		    std::cerr << color.red << "Error: " << color.reset << "Missing required arguments. \n\n" << options.help() << std::endl;
+		    return 1;
+		}
+		std::string fhash = getHash(file_stream);
+		std::cout << fhash<< std::endl;
+		return 0;
+	    } else {
+		// if nothing is given then print opts
+		std::cerr << color.red << "Error: " << color.reset << "Missing required arguments. \n\n" << options.help() << std::endl;
+		return 1;
+	    }
         }
 
         // 1 evaluates to true
@@ -160,16 +174,6 @@ int main(int argc, char* argv[]) {
             std::cerr << color.red << "Error: " << color.reset << "Could not open file: '" << filename << "'.\n";
             return 1;
         }
-
-        // This vector based approach is inefficient. Just hashing a 1.5Gig file scaled to 1MB :/
-        // TODO: switch to a buffer based approach
-
-        // Create a vector that'll store the hashed value in bytes (??)
-        // std::vector<unsigned char> s(picosha2::k_digest_size);
-        // picosha2::hash256(file_stream, s.begin(), s.end());
-
-        // // Bytes to the actual string
-        // std::string computedHash = picosha2::bytes_to_hex_string(s.begin(), s.end());
 
         std::string computedHash = getHash(file_stream);
 
