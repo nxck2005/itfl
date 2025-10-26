@@ -1,4 +1,7 @@
 # itfl: Is This File Legit
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![C++ Version](https://img.shields.io/badge/c++-17-blue.svg)
+
 A lightweight command-line utility for SHA-256 file integrity verification.
 
 ## Description
